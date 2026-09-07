@@ -11,6 +11,7 @@ Run one production instance of the Currency Telegram Bot on the existing Ubuntu 
 - The bot has no published host ports. Its Fastify health route is available only inside the container.
 - The existing Docker containers and their networks remain unchanged.
 - The production token is stored only in `/opt/currency-bot/.env`, is excluded from Git, and has mode `600`.
+- The GitHub repository is made public only after confirming that its complete history contains no token, deploy key, server password, or other secret.
 - The server is Ubuntu 26.04 with Docker 29 and Compose 5. It has 1.9 GiB RAM, no swap, and approximately 1.0 GiB currently available RAM.
 
 ## Architecture
@@ -25,9 +26,9 @@ The service reads `TELEGRAM_BOT_TOKEN` and `PORT` from the server-only `.env` fi
 
 ## Server Bootstrap and Source Access
 
-Create an unprivileged `currencybot` account that owns `/opt/currency-bot`. Create an SSH deploy key for that account and add its public key to the `ChiteS33/currency-telegram-bot` GitHub repository as a read-only deploy key. The private key stays in the account's `.ssh` directory with restrictive permissions.
+Create an unprivileged `currencybot` account that owns `/opt/currency-bot`. Make the `ChiteS33/currency-telegram-bot` GitHub repository public after completing the required history review. The server clones the public repository over HTTPS and needs no GitHub deploy key or repository credential.
 
-Clone the private repository into `/opt/currency-bot`. Create `.env` directly on the server, set `TELEGRAM_BOT_TOKEN` and `PORT=3000`, and set its permissions to `600`. Neither the deploy key nor `.env` is committed to Git.
+Clone the public repository into `/opt/currency-bot`. Create `.env` directly on the server, set `TELEGRAM_BOT_TOKEN` and `PORT=3000`, and set its permissions to `600`. The environment file is never committed to Git.
 
 ## Lifecycle
 
@@ -48,6 +49,7 @@ The application already handles `SIGTERM`; Docker restart policy restores it aft
 ## Verification
 
 - Repository working tree contains no token or server deploy key.
+- The repository is public only after a history review confirms that it contains no secret.
 - Image build completes without exhausting the server's available RAM or disk.
 - The `currency-bot` service is running and healthy.
 - `docker ps` shows no published ports for the bot.
