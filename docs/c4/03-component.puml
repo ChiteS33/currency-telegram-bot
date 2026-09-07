@@ -1,0 +1,35 @@
+@startuml CurrencyTelegramBot-Component
+!include <C4/C4_Component>
+
+title Component: Telegram currency-request flow
+
+LAYOUT_TOP_DOWN()
+
+Person(user, "Telegram user", "Sends a three-letter currency code.")
+System_Ext(telegram, "Telegram", "Messaging platform and Bot API.")
+System_Ext(frankfurter, "Frankfurter API", "Public HTTP exchange-rate API.")
+
+Container_Boundary(node_process, "Currency Telegram Bot — Node.js process") {
+  Component(telegram_bot, "createTelegramBot", "Telegraf adapter", "Long-polls text updates, invokes the handler, and replies to Telegram.")
+  Component(message_handler, "createCurrencyMessageHandler", "Presentation adapter", "Maps input and application errors to user-facing text.")
+  Component(get_exchange_rate, "GetExchangeRate", "Application use case", "Parses a currency code and obtains its USD rate.")
+  Component(provider_port, "ExchangeRateProvider", "Application port", "Defines getUsdRate(base): Promise<ExchangeRate>.")
+  Component(frankfurter_provider, "FrankfurterExchangeRateProvider", "Infrastructure adapter", "Calls Frankfurter and maps its response to ExchangeRate.")
+  Component(health_route, "registerHealthRoute", "Fastify route", "Responds to GET /health with status ok.")
+}
+
+Rel(user, telegram, "Sends currency code and reads result", "Telegram client")
+Rel(telegram, telegram_bot, "Delivers updates and receives replies", "Telegram Bot API")
+Rel(telegram_bot, message_handler, "Passes message text")
+Rel(message_handler, get_exchange_rate, "Executes lookup")
+Rel(get_exchange_rate, provider_port, "Requests USD rate")
+Rel(frankfurter_provider, provider_port, "Implements")
+Rel(frankfurter_provider, frankfurter, "Gets latest rate", "HTTPS/JSON")
+
+note right of health_route
+  Independent of the Telegram
+  currency-request flow.
+end note
+
+SHOW_LEGEND()
+@enduml

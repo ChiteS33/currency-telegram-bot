@@ -1,0 +1,18 @@
+@startuml CurrencyTelegramBot-SystemContext
+!include <C4/C4_Context>
+
+title System Context: Currency Telegram Bot
+
+LAYOUT_TOP_DOWN()
+
+Person(user, "Telegram user", "Requests the value of a currency in USD.")
+System(currency_bot, "Currency Telegram Bot", "Returns exchange rates for three-letter currency codes.")
+System_Ext(telegram, "Telegram", "Delivers messages and receives bot replies.")
+System_Ext(frankfurter, "Frankfurter API", "Public HTTP exchange-rate API.")
+
+Rel(user, telegram, "Sends a currency code and reads the reply", "Telegram client")
+Rel(telegram, currency_bot, "Delivers updates; receives replies", "Telegram Bot API")
+Rel(currency_bot, frankfurter, "Requests a rate with USD as quote currency", "HTTPS/JSON")
+
+SHOW_LEGEND()
+@enduml

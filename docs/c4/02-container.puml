@@ -1,0 +1,28 @@
+@startuml CurrencyTelegramBot-Container
+!include <C4/C4_Container>
+
+title Container: Currency Telegram Bot
+
+LAYOUT_TOP_DOWN()
+
+Person(user, "Telegram user", "Requests a currency rate.")
+System_Ext(telegram, "Telegram", "Messaging platform and Bot API.")
+System_Ext(frankfurter, "Frankfurter API", "Public HTTP exchange-rate API.")
+
+System_Boundary(currency_bot, "Currency Telegram Bot") {
+  Container(node_process, "Node.js process", "Node.js, TypeScript", "Runs the bot and HTTP host in one process.")
+}
+
+Rel(user, telegram, "Sends a currency code and receives the result", "Telegram client")
+Rel(telegram, node_process, "Long-polls text updates; sends replies", "Telegram Bot API")
+Rel(node_process, frankfurter, "Gets latest rate for base currency to USD", "HTTPS/JSON")
+
+note right of node_process
+  Contains:
+  - Telegraf long-polling adapter
+  - Fastify GET /health route
+  - application and domain logic
+end note
+
+SHOW_LEGEND()
+@enduml
