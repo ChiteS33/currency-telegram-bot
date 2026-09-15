@@ -2,7 +2,7 @@
 
 ## Docker deployment
 
-Бот запускается на сервере как отдельный Compose-проект `currency-bot`. Он использует Telegram long polling, поэтому наружные порты не открываются: `/health` доступен только внутри контейнера. Не запускайте больше одного экземпляра с тем же `TELEGRAM_BOT_TOKEN`.
+Бот запускается на сервере как отдельный Compose-проект `currency-bot`. Он использует Telegram long polling, для домашнего задания порт 3000 опубликован наружу: `/health` и `/homework` доступны по HTTP. Не запускайте больше одного экземпляра с тем же `TELEGRAM_BOT_TOKEN`.
 
 Перед первой публикацией проверьте историю Git и сделайте репозиторий публичным только если в ней нет настоящего токена, пароля или ключа:
 
@@ -77,3 +77,11 @@ npm run build
 # C4 Model diagrams
 
 The editable PlantUML C4 diagrams are in [docs/c4](docs/c4/README.md): system context, container, and Telegram request-flow component views.
+
+## Homework endpoint
+
+`GET http://159.194.226.200:3000/homework` returns:
+
+```json
+{ "message": "hello, it-incubator", "studentId": 5462 }
+```
