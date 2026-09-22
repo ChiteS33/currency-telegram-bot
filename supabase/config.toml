@@ -1,0 +1,5 @@
+[functions.get-clients]
+verify_jwt = false
+
+[functions.get-messages]
+verify_jwt = false
